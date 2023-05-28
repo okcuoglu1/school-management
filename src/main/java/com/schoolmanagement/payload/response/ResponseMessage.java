@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 //Custom ResponseEntity mizi olusturduk.
 public class ResponseMessage<E> {
 
-    private E object;
+    private E object; //Normlade response entity de message ve http status code yolluyor ama biz objeyi de yollamak istiyoruz.
     private String message;
     private HttpStatus httpStatus;
 
