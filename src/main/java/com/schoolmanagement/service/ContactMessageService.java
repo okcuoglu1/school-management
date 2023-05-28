@@ -94,6 +94,7 @@ public class ContactMessageService {
         // return contactMessageRepository.findAll(pageable).map(r->createResponse(r));
     }
 
+    // Not: searchByEmail() *************************************
     public Page<ContactMessageResponse> searchByEmail(String email, int page, int size, String sort, String type) {
 
         Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
@@ -105,6 +106,17 @@ public class ContactMessageService {
         return contactMessageRepository.findByEmailEquals(email, pageable).map(this::createResponse);
 
 
+    }
+    // Not: searchBySubject()************************************
+    public Page<ContactMessageResponse> searchBySubject(String subject, int page, int size, String sort, String type) {
+
+        Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
+
+        if(Objects.equals(type, "desc")) {
+            pageable = PageRequest.of(page,size,Sort.by(sort).descending());
+        }
+
+        return contactMessageRepository.findBySubjectEquals(subject, pageable).map(this::createResponse);
 
 
 

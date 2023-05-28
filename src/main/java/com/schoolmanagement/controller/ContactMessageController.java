@@ -54,6 +54,17 @@ public class ContactMessageController {
 
 
     // Not: searchBySubject()************************************
+    @GetMapping("/searchBySubject")
+    public Page<ContactMessageResponse> searchBySubject(
+            @RequestParam(value = "subject") String subject,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", defaultValue = "date") String sort,
+            @RequestParam(value = "type", defaultValue = "desc") String type
+    ){
+        return contactMessageService.searchBySubject(subject,page,size,sort,type);
+
+    }
 
 
 }
