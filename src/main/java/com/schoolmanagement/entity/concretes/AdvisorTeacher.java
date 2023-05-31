@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,10 +24,18 @@ public class AdvisorTeacher implements Serializable {
 
     @OneToOne
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //DBDEN OKUMA YAPILDIĞINDA ROLE BİLGİSİ GİTMESİN.
-     private UserRole userRole;
+    private UserRole userRole;
 
+    @OneToOne
+    private Teacher teacher;
 
-    //TODO !!! Teacher - Student - Meet
+    @OneToMany(mappedBy = "advisorTeacher", orphanRemoval = true, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<Student> students;
+
+    @OneToMany(mappedBy = "advisorTeacher", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<Meet> meets;
+
 
 
 }
