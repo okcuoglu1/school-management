@@ -19,6 +19,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder //Alt sınıfların user sınıfının builder özelliklerini kullanabilmesine izin verir.
+// Alt siniflarin USer sinifinin builder ozelliklerini kullanabilmesine izin verir
+// !!! @SuperBuilder ile @Builder arasindaki temel fark :https://www.baeldung.com/lombok-builder-inheritance
+// !!! @SuperBuilder in duzgun calismasi icin hem parent a hem de childa @SuperBuilder eklenmeli
 public abstract class User implements Serializable {
 
     @Id

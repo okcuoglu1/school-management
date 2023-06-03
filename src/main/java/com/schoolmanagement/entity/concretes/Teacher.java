@@ -3,7 +3,6 @@ package com.schoolmanagement.entity.concretes;
 import com.schoolmanagement.entity.abstracts.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import net.bytebuddy.implementation.bind.annotation.Super;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class Teacher extends User {
 
-    @OneToOne (mappedBy = "teacher", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(mappedBy = "teacher", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private AdvisorTeacher advisorTeacher;
 
     @Column(name = "isAdvisor")
@@ -27,21 +26,18 @@ public class Teacher extends User {
     @Column(unique = true)
     private String email;
 
+
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.REMOVE)
     private List<StudentInfo> studentInfos;
 
     @ManyToMany
     @JoinTable(
-            name = "teacher_lessonProgram",
+            name = "teacher_lessonprogram",
             joinColumns = @JoinColumn(name = "teacher_id"),
             inverseJoinColumns = @JoinColumn(name = "lesson_program_id")
     )
-    private Set<LessonProgram> lessonProgramList;
-
-
-
-
-
-
-
+    private Set<LessonProgram> lessonsProgramList;
 }
+
+
+

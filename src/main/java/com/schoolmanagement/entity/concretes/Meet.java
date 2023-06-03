@@ -1,6 +1,7 @@
 package com.schoolmanagement.entity.concretes;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,10 +36,17 @@ public class Meet implements Serializable {
     private LocalTime stopTime;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnoreProperties({"teacher"}) //json da advisor teacherdaki teacher fieldı gitmesin.
     private AdvisorTeacher advisorTeacher;
 
-    //Kontrol edilecek....
-    @ManyToMany(mappedBy = "meetList", fetch = FetchType.EAGER)
+
+    //@ManyToMany(mappedBy = "meetList", fetch = FetchType.EAGER)
+    @ManyToMany
+    @JoinTable(
+            name = "meet_student_table",
+            joinColumns = @JoinColumn(name = "meet_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id"))
     private List<Student> studentList;
+
 
 }
