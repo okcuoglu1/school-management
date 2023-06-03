@@ -20,7 +20,7 @@ public class UserRoleService {
 
     public UserRole getUserRole(RoleType roleType) {
 
-     Optional<UserRole> userRole =  userRoleRepository.findByERoleEqueals(roleType); //JPQL yazıcaz türemesin diye E kullandık.
+     Optional<UserRole> userRole =  userRoleRepository.findByERoleEquals(roleType); //JPQL yazıcaz türemesin diye E kullandık.
         return userRole.orElse(null); //Eğer null değilse bu yapıyı bana döndür.
 
 
@@ -32,7 +32,7 @@ public class UserRoleService {
     }
 
     public UserRole save(RoleType roleType) {
-        if(userRoleRepository.existsByERoleEqueals(roleType)) {
+        if(userRoleRepository.existsByERoleEquals(roleType)) {
             throw new ConflictException("This role is already registered");
         }
 

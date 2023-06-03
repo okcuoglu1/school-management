@@ -27,11 +27,10 @@ public class SchoolManagementApplication implements CommandLineRunner {
 		SpringApplication.run(SchoolManagementApplication.class, args);
 	}
 
-	//CommandLineRunner interface i ile uygulama ayağa kalkmadan setlemek istediğimiz şeyleri setleyebiliriz.
 	@Override
 	public void run(String... args) throws Exception {
 
-		// !!! Role tablomu dolduracagim -> UserRolede kimse yoksa bu rolleri save et
+		// !!! Role tablomu dolduracagim
 		if(userRoleService.getAllUserRole().size()==0) {
 			userRoleService.save(RoleType.ADMIN);
 			userRoleService.save(RoleType.MANAGER);
@@ -45,7 +44,7 @@ public class SchoolManagementApplication implements CommandLineRunner {
 		//!!! Admin olusturulacak  built_in
 		if(adminService.countAllAdmin()==0) {
 			AdminRequest admin = new AdminRequest();
-			admin.setUsername("Admin"); //Admin save ederken eğer username "Admin" ise built in yap demiştik o yüzden simdi o kolaylıgı kullandık.
+			admin.setUsername("Admin");
 			admin.setSsn("987-99-9999");
 			admin.setPassword("12345678");
 			admin.setName("Admin");
@@ -56,7 +55,6 @@ public class SchoolManagementApplication implements CommandLineRunner {
 			admin.setBirthPlace("US");
 			adminService.save(admin);
 		}
-
 
 	}
 }
