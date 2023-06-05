@@ -36,7 +36,7 @@ public class DeanController {
     //Sadece benim verdiğim datalar değişsin diğerleri aynı kalsın istiyorsak Patch Mapping. Ama put mapping de tüm dataları setlememiz gerek.
     //Yoksa setlenmeyen datalar null gözükür.
     @PutMapping("/update/{userId}") //http://localhost:8080/dean/update/1
-    @PreAuthorize("hasAuthority('ADMIN')") //TODO: DEAN EKLENMELİ
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseMessage<DeanResponse> update(@RequestBody @Valid DeanRequest deanRequest, @PathVariable Long userId){
 
         return deanService.update(deanRequest, userId);
@@ -73,7 +73,7 @@ public class DeanController {
     // Not :  Search() *************************************************************************
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/search") // hht://localhost:8080/dean/search
-    public Page<DeanResponse> search( //TODO: getAllWithPage
+    public Page<DeanResponse> search( // search ismi yanlıs olmus bu methodun ismi -> getAllWithPage
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size,
             @RequestParam(value = "sort") String sort,

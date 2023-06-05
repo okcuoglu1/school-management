@@ -140,7 +140,7 @@ public class DeanService {
     //Not: Delete()***********************************
     public ResponseMessage<?> deleteDean(Long deanId) {
 
-        Optional<Dean> dean = findByeId(deanId);
+        Optional<Dean> dean = checkDeanExists(deanId);
 
         deanRepository.deleteById(deanId);
 
@@ -156,7 +156,7 @@ public class DeanService {
     // Not :  getById() *******************************************************
     public ResponseMessage<DeanResponse> getDeanById(Long userId) {
 
-        Optional<Dean> dean = findByeId(userId);
+        Optional<Dean> dean = checkDeanExists(userId);
 
 
         return ResponseMessage.<DeanResponse>builder()
@@ -190,8 +190,8 @@ public class DeanService {
     }
 
 
-    //yardımcı method
-    private Optional<Dean> findByeId(Long userId) {
+    // tekrarlanan kod blogu icin  yardımcı method
+    private Optional<Dean> checkDeanExists(Long userId) {
 
         Optional<Dean> dean = deanRepository.findById(userId);
 
