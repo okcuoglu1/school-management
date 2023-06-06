@@ -168,6 +168,31 @@ public class ViceDeanService {
         }
 
         return viceDeanRepository.findAll(pageable).map(this::createViceDeanResponse);
+
+        /*
+
+viceDeanRepository.findAll(pageable) metodu bir Page nesnesi döndürür. Bu nedenle, map() metodunu kullanarak Stream'e çevirmek gerekli
+değildir. Bunun yerine, findAll() metodunun döndürdüğü Page nesnesinin map() yöntemi kullanılarak elemanları üzerinde işlem yapılabilir.
+
+Ayrıca, Spring Data JPA tarafından sağlanan PagingAndSortingRepository arayüzü, Page nesnelerinin kullanımını kolaylaştırır.
+findAll(pageable) yöntemi, sayfalama özelliklerini kullanarak veritabanından verileri getirir ve Page nesnesi olarak döndürür.
+Bu nedenle, Stream kullanmak gereksiz olacaktır.
+Stream ve Page farklı veri yapılarıdır ve farklı amaçlara hizmet ederler. Bu nedenle, Stream kullanmak ile Page kullanmak arasında bir
+tercih yapmak gerekir.
+
+Stream, bir koleksiyondan elemanları tek tek işlemek için kullanılır. Örneğin, elimizde bir liste varsa, bu listeyi stream() yöntemi ile
+Stream nesnesine dönüştürerek, elemanlar üzerinde filtreleme, sıralama, haritalama veya herhangi bir işlem yapabiliriz. Stream genellikle
+küçük ölçekli veriler ile çalışmak için kullanılır.
+
+Öte yandan, Page, büyük ölçekteki verileri sayfalama (pagination) işlemleri için kullanılır. Özellikle veritabanı sorgularından gelen
+büyük veri kümelerinde performans artışı sağlamak için kullanılabilir. Spring Data tarafından sağlanan PagingAndSortingRepository arayüzü,
+Page nesnelerini kullanımını kolaylaştırır.
+
+Bu nedenle, Stream ve Page farklı amaçlara hizmet ettiği için, birisi yerine diğerinin kullanılması doğru olmayabilir. Eğer elemanları
+tek tek işlemek istiyorsak Stream kullanırız ancak büyük veri kümelerinde sayfalama işlemleri yapmak istiyorsak Page kullanırız.
+
+
+ */
     }
 
 

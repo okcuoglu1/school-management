@@ -15,4 +15,6 @@ public class AdminRequest extends BaseUserRequest {
     private boolean built_in; //Herhangi bir obje built_in ise service katında silemezsin diye belirticez.
 
 
+
+
 }
