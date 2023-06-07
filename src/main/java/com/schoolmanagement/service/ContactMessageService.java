@@ -30,10 +30,11 @@ public class ContactMessageService {
 
         // !!! Ayni kisi ayni gün icinde sadece 1 defa mesaj gönderebilsin.
         //aynı gün icerisinde Aynı maille mesaj atılmış mı kontrol edicez.
-        boolean isSameMessageWithSameEmailForToday = contactMessageRepository.
-        existsByEmailEqualsAndDateEquals(contactMessageRequest.getEmail(), LocalDate.now());
-
-        if(isSameMessageWithSameEmailForToday) throw new ConflictException(String.format(ALREADY_SEND_A_MESSAGE_TODAY));
+        //Not Düzeltme -> kullanıcı birden fazla mesaj atabilsin dedik. O yüzden comment
+//        boolean isSameMessageWithSameEmailForToday = contactMessageRepository.
+//        existsByEmailEqualsAndDateEquals(contactMessageRequest.getEmail(), LocalDate.now());
+//
+//        if(isSameMessageWithSameEmailForToday) throw new ConflictException(String.format(ALREADY_SEND_A_MESSAGE_TODAY));
 
         ContactMessage contactMessage = createObject(contactMessageRequest);
         ContactMessage savedData = contactMessageRepository.save(contactMessage);

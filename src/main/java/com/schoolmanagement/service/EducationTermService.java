@@ -104,12 +104,8 @@ public class EducationTermService {
     // Not :  Delete() *************************************************************************
     public ResponseMessage<?> deleteTerm(Long id) {
 
-      Optional<EducationTerm> term =  educationTermRepository.findById(id);
-
-      if(!term.isPresent()){ //isEmpty de calısır.
-
-          throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE, id));
-      }
+      if(!educationTermRepository.existsById(id)){
+          throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE,id));      }
 
       educationTermRepository.deleteById(id);
 
@@ -132,6 +128,17 @@ public class EducationTermService {
 
         educationTermRepository.save(updatedTerm);
 
+        //Not: bu işlem fiedları setlemeden önce bos bir obje olusturur.
+//        ResponseMessage.ResponseMessageBuilder<EducationTermResponse> responseMessageBuilder =
+//                ResponseMessage.builder();
+
+//        return responseMessageBuilder
+//                .object(createEducationTermResponse(updated))
+//                .message("Education Term Updated Successfully")
+//                .build();
+
+
+
         return ResponseMessage.<EducationTermResponse>builder().
                 message("Education Term is updated successfully").
                 object(createEducationTermResponse(updatedTerm)).
@@ -147,19 +154,24 @@ public class EducationTermService {
 
         //!!! son kayiot tarihi , ders doneminin baslangic tarihinde nsonra olmamali :
 
-        if(request.getLastRegistrationDate().isAfter(request.getStartDate())) {
-            throw new ResourceNotFoundException(Messages.EDUCATION_START_DATE_IS_EARLIER_THAN_LAST_REGISTRATION_DATE);
+        if(request.getStartDate()!=null && request.getLastRegistrationDate()!=null) {
+            if(request.getLastRegistrationDate().isAfter(request.getStartDate())) {
+                throw new ResourceNotFoundException(Messages.EDUCATION_START_DATE_IS_EARLIER_THAN_LAST_REGISTRATION_DATE);
+            }
         }
 
-        //!!! bitis tarigi baslangic tarihinden once olmamali
-        if(request.getEndDate().isBefore(request.getStartDate())){
-            throw  new ResourceNotFoundException(Messages.EDUCATION_END_DATE_IS_EARLIER_THAN_START_DATE);
+        // !!! startDate-endDate kontrolu
+        if(request.getStartDate()!= null && request.getEndDate()!=null){
+            if(request.getEndDate().isBefore(request.getStartDate())){
+                throw new ResourceNotFoundException(Messages.EDUCATION_END_DATE_IS_EARLIER_THAN_START_DATE);
+            }
         }
 
-        // !!! ayni term ve baslangic tarihine sahip birden fazla kayit var mi kontrolu
-        if(educationTermRepository.existsByTermAndYear(request.getTerm(), request.getStartDate().getYear())) {
-            throw  new ResourceNotFoundException(Messages.EDUCATION_TERM_IS_ALREADY_EXIST_BY_TERM_AND_YEAR_MESSAGE);
-        }
+        //not sadece start date veya lastregistrationdate degisse buraya takılır ve kodu patlatır.
+//        // !!! ayni term ve baslangic tarihine sahip birden fazla kayit var mi kontrolu
+//        if(educationTermRepository.existsByTermAndYear(request.getTerm(), request.getStartDate().getYear())) {
+//            throw  new ResourceNotFoundException(Messages.EDUCATION_TERM_IS_ALREADY_EXIST_BY_TERM_AND_YEAR_MESSAGE);
+//        }
 
     }
 

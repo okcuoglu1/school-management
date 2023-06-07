@@ -56,7 +56,7 @@ public class EducationTermController {
     }
 
     // Not :  Delete() *************************************************************************
-    @DeleteMapping("/delete/{id}") // http://localhost:8080/educationTerms/delete
+    @DeleteMapping("/delete/{id}") // http://localhost:8080/educationTerms/delete/1
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     public ResponseMessage<?> delete(@PathVariable Long id ){
 
