@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +28,24 @@ public class EducationTermService {
     // Not :  Save() *************************************************************************
     public ResponseMessage<EducationTermResponse> save(EducationTermRequest request) {
 
-        checkDate(request);
+        //!!! son kayit tarihi , ders doneminin baslangic tarihinden sonra olmamali :
+
+        checkEducationTermDate(request);
+
+/*        if(request.getLastRegistrationDate().isAfter(request.getStartDate())) {
+            throw new ResourceNotFoundException(Messages.EDUCATION_START_DATE_IS_EARLIER_THAN_LAST_REGISTRATION_DATE);
+        }
+
+        //!!! bitis tarigi baslangic tarihinden once olmamali
+        if(request.getEndDate().isBefore(request.getStartDate())){
+            throw  new ResourceNotFoundException(Messages.EDUCATION_END_DATE_IS_EARLIER_THAN_START_DATE);
+        }
+
+        // !!! ayni term ve baslangic tarihine sahip birden fazla kayit var mi kontrolu
+        if(educationTermRepository.existsByTermAndYear(request.getTerm(), request.getStartDate().getYear())) {
+            throw  new ResourceNotFoundException(Messages.EDUCATION_TERM_IS_ALREADY_EXIST_BY_TERM_AND_YEAR_MESSAGE);
+        }
+  */ // tarih kontrolu eski versiyon
 
         // !!! save metoduna dto- pojo donusumu yapip gonderiyoruz
         EducationTerm savedEducationTerm = educationTermRepository.save(createEducationTerm(request));
@@ -55,25 +71,20 @@ public class EducationTermService {
                 .build();
     }
 
-    private EducationTermResponse createEducationTermResponse(EducationTerm request) {
+    private EducationTermResponse createEducationTermResponse(EducationTerm response) {
 
         return EducationTermResponse.builder()
-                .id(request.getId())
-                .term(request.getTerm())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .lastRegistrationDate(request.getLastRegistrationDate())
+                .id(response.getId())
+                .term(response.getTerm())
+                .startDate(response.getStartDate())
+                .endDate(response.getEndDate())
+                .lastRegistrationDate(response.getLastRegistrationDate())
                 .build();
 
     }
 
     // Not :  getById() ************************************************************************
     public EducationTermResponse get(Long id) {
-
-        // !!! ya yoksa kontrolu
-        if(!educationTermRepository.existsByIdEquals(id)) { // existsById de calisir
-            throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE, id));
-        }
 
         // !!! POJO - DTO donusumu ile response hazirlaniyor
         return createEducationTermResponse(educationTermRepository.findByIdEquals(id)); // findById de calisir
@@ -97,63 +108,39 @@ public class EducationTermService {
         }
 
         return educationTermRepository.findAll(pageable).map(this::createEducationTermResponse);
-
     }
 
 
     // Not :  Delete() *************************************************************************
-    public ResponseMessage<?> deleteTerm(Long id) {
+    public ResponseMessage<?> delete(Long id) {
 
-      if(!educationTermRepository.existsById(id)){
-          throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE,id));      }
+        // !!! id kontrolu
+        checkEducationTermExists(id);
+        /*      if(!educationTermRepository.existsById(id)){
+              throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE,id));
+        }
+        */ // Id kontrolu Eski versiyonu
 
-      educationTermRepository.deleteById(id);
+        educationTermRepository.deleteById(id);
 
-      return ResponseMessage.builder().message("Education Term is deleted").httpStatus(HttpStatus.OK).build();
-
+        return ResponseMessage.builder()
+                .message("Education term deleted successfully")
+                .httpStatus(HttpStatus.CREATED)
+                .build();
     }
-
-
 
 
     // Not :  UpdateById() ********************************************************************
-    public ResponseMessage<EducationTermResponse> updateTerm(EducationTermRequest educationTermRequest, Long id) {
+    public ResponseMessage<EducationTermResponse> update(Long id, EducationTermRequest request) {
 
-      EducationTerm term =  educationTermRepository.findById(id).orElseThrow(() ->
-              new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE,id)));
+        // !!! id kontrolu
+        checkEducationTermExists(id);
+        /*      if(!educationTermRepository.existsById(id)){
+              throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE,id));
+        }
+        */ // Id kontrolu Eski versiyonu
 
-        checkDate(educationTermRequest);
-
-        EducationTerm updatedTerm = createUpdatedEduTerm(educationTermRequest,id);
-
-        educationTermRepository.save(updatedTerm);
-
-        //Not: bu işlem fiedları setlemeden önce bos bir obje olusturur.
-//        ResponseMessage.ResponseMessageBuilder<EducationTermResponse> responseMessageBuilder =
-//                ResponseMessage.builder();
-
-//        return responseMessageBuilder
-//                .object(createEducationTermResponse(updated))
-//                .message("Education Term Updated Successfully")
-//                .build();
-
-
-
-        return ResponseMessage.<EducationTermResponse>builder().
-                message("Education Term is updated successfully").
-                object(createEducationTermResponse(updatedTerm)).
-                httpStatus(HttpStatus.OK).
-                build();
-
-
-    }
-
-
-    //NOT: TARİHLERİN KONTROLÜ İCİN YARDIMCI METHOD
-    private void checkDate(EducationTermRequest request){
-
-        //!!! son kayiot tarihi , ders doneminin baslangic tarihinde nsonra olmamali :
-
+        // !!! getStartDate ve lastRegistrationDate kontrolu
         if(request.getStartDate()!=null && request.getLastRegistrationDate()!=null) {
             if(request.getLastRegistrationDate().isAfter(request.getStartDate())) {
                 throw new ResourceNotFoundException(Messages.EDUCATION_START_DATE_IS_EARLIER_THAN_LAST_REGISTRATION_DATE);
@@ -167,25 +154,63 @@ public class EducationTermService {
             }
         }
 
-        //not sadece start date veya lastregistrationdate degisse buraya takılır ve kodu patlatır.
-//        // !!! ayni term ve baslangic tarihine sahip birden fazla kayit var mi kontrolu
-//        if(educationTermRepository.existsByTermAndYear(request.getTerm(), request.getStartDate().getYear())) {
-//            throw  new ResourceNotFoundException(Messages.EDUCATION_TERM_IS_ALREADY_EXIST_BY_TERM_AND_YEAR_MESSAGE);
-//        }
+        ResponseMessage.ResponseMessageBuilder<EducationTermResponse> responseMessageBuilder =
+                ResponseMessage.builder();
+
+        EducationTerm updated = createUpdatedEducationTerm(id,request);
+        educationTermRepository.save(updated);
+
+        return responseMessageBuilder
+                .object(createEducationTermResponse(updated))
+                .message("Education Term Updated Successfully")
+                .build();
 
     }
 
-    //NOT UPDATE EDİLEN EDUCATION TERMI POJO DONUSTUREN METHOD
-    private EducationTerm createUpdatedEduTerm(EducationTermRequest request, Long id){
-
-      return  EducationTerm.builder().
-                id(id).
-                term(request.getTerm()).
-                startDate(request.getStartDate()).
-                endDate(request.getEndDate()).
-                lastRegistrationDate(request.getLastRegistrationDate()).
-                build();
-
+    private EducationTerm createUpdatedEducationTerm(Long id, EducationTermRequest request) {
+        return EducationTerm.builder()
+                .id(id)
+                .term(request.getTerm())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .lastRegistrationDate(request.getLastRegistrationDate())
+                .build();
     }
+
+    // Not :  getById() ********************************************************************
+    public EducationTerm getById(Long educationTermId) {
+
+        checkEducationTermExists(educationTermId);
+
+        return educationTermRepository.findByIdEquals(educationTermId);
+    }
+
+    //Not:  ---> EDUCATION-TERM-SERVICE <---
+
+    //!!! ODEV-1 : ya yoksa kontrolleri method uzerinden cagrilmali
+    private void checkEducationTermExists(Long id) {
+        if (!educationTermRepository.existsByIdEquals(id)) {
+            throw new ResourceNotFoundException(String.format(Messages.EDUCATION_TERM_NOT_FOUND_MESSAGE, id));
+        }
+    }
+    //!!! ODEV-2 : save methodundaki tarih kontrolleri ayri bir method uzerinden cagrilmali
+    private void checkEducationTermDate(EducationTermRequest request){
+        //!!! son kayit tarihi , ders doneminin baslangic tarihinden sonra olmamali :
+
+        if(request.getLastRegistrationDate().isAfter(request.getStartDate())) {
+            throw new ResourceNotFoundException(Messages.EDUCATION_START_DATE_IS_EARLIER_THAN_LAST_REGISTRATION_DATE);
+        }
+
+        //!!! bitis tarigi baslangic tarihinden once olmamali
+        if(request.getEndDate().isBefore(request.getStartDate())){
+            throw  new ResourceNotFoundException(Messages.EDUCATION_END_DATE_IS_EARLIER_THAN_START_DATE);
+        }
+
+        // !!! ayni term ve baslangic tarihine sahip birden fazla kayit var mi kontrolu
+        if(educationTermRepository.existsByTermAndYear(request.getTerm(), request.getStartDate().getYear())) {
+            throw  new ResourceNotFoundException(Messages.EDUCATION_TERM_IS_ALREADY_EXIST_BY_TERM_AND_YEAR_MESSAGE);
+        }
+    }
+
 
 }

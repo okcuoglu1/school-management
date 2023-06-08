@@ -4,7 +4,6 @@ import com.schoolmanagement.payload.request.EducationTermRequest;
 import com.schoolmanagement.payload.response.EducationTermResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.service.EducationTermService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +32,7 @@ public class EducationTermController {
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER','TEACHER')") // student ?
     @GetMapping("/{id}")  // http://localhost:8080/educationTerms/1
     public EducationTermResponse get(@PathVariable Long id){
-        return educationTermService.get(id);
+        return educationTermService.getById(id);
     }
 
     // Not :  getAll() *************************************************************************
