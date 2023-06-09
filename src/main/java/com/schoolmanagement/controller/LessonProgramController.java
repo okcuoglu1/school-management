@@ -5,6 +5,7 @@ import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.service.LessonProgramService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,7 @@ public class LessonProgramController {
     }
 
     // Not :  getAllLessonProgramUnassigned() **************************************************
+    //öğretmeni atanmamış lesson programları
     @GetMapping("/getAllUnassigned") //http://localhost:8080/lessonPrograms/getAllUnassigned
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER','TEACHER','STUDENT')")
     public List<LessonProgramResponse> getAllUnassigned() {
@@ -61,7 +63,11 @@ public class LessonProgramController {
     public ResponseMessage delete (@PathVariable Long id) {
         return lessonProgramService.deleteLessonProgram(id);
     }
+
     // Not :  getLessonProgramByTeacher() ******************************************************
+    //Requestten de bilgileri alabiliriz. attributelerle bunu yapabiliriz.
+    //anlık olarak loginden alabilirim
+    //pathvariable ve request param ile alabilirim.
     @PreAuthorize("hasAnyAuthority('TEACHER','ADMIN','MANAGER','ASSISTANTMANAGER')")
     @GetMapping("/getAllLessonProgramByTeacher")  //http://localhost:8080/lessonPrograms/getAllLessonProgramByTeacher
     public Set<LessonProgramResponse> getAllLessonProgramByTeacherId(HttpServletRequest httpServletRequest) {
@@ -70,6 +76,30 @@ public class LessonProgramController {
         return lessonProgramService.getLessonProgramByTeacher(username);
 
     }
+
+    //Not: getLessonProgramStudent() ******************************************************
+    @GetMapping("/getAllLessonProgramByStudent") //http://localhost:8080/lessonPrograms/getAllLessonProgramByStudent
+    @PreAuthorize("hasAnyAuthority('TEACHER','ADMIN','MANAGER','ASSISTANTMANAGER')")
+    public Set<LessonProgramResponse> getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
+
+
+        String username = (String) httpServletRequest.getAttribute("username");
+        return lessonProgramService.getLessonProgramByStudent(username);
+
+    }
+
+    // Not :  getAllWithPage() ******************************************************************
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER','TEACHER','STUDENT')")
+    @GetMapping("/search")
+    public Page<LessonProgramResponse> search(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size,
+            @RequestParam(value = "sort") String sort,
+            @RequestParam(value = "type") String type
+    ){
+        return lessonProgramService.search(page,size,sort,type);
+    }
+
 
 
 

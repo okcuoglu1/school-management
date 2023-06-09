@@ -32,7 +32,7 @@ public class EducationTermController {
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER','TEACHER')") // student ?
     @GetMapping("/{id}")  // http://localhost:8080/educationTerms/1
     public EducationTermResponse get(@PathVariable Long id){
-        return educationTermService.getById(id);
+        return educationTermService.get(id);
     }
 
     // Not :  getAll() *************************************************************************
@@ -59,7 +59,7 @@ public class EducationTermController {
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     public ResponseMessage<?> delete(@PathVariable Long id ){
 
-        return educationTermService.deleteTerm(id);
+        return educationTermService.delete(id);
 
     }
 
@@ -72,7 +72,7 @@ public class EducationTermController {
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     public ResponseMessage<EducationTermResponse> update(@RequestBody @Valid EducationTermRequest educationTermRequest, @PathVariable Long id){
 
-       return educationTermService.updateTerm(educationTermRequest, id);
+       return educationTermService.update(id,educationTermRequest);
 
     }
 

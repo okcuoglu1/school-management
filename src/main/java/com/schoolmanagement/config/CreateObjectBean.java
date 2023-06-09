@@ -2,9 +2,12 @@ package com.schoolmanagement.config;
 
 import com.schoolmanagement.payload.dto.DeanDto;
 import com.schoolmanagement.payload.dto.LessonProgramDto;
+import com.schoolmanagement.payload.dto.TeacherRequestDto;
 import com.schoolmanagement.payload.dto.ViceDeanDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+
 
 @Configuration
 public class CreateObjectBean { //Bu class olusturdugumuz beanleri toplu bi sekilde görmemizi, revize etmemizi, takip etmeyi kolaylastırır.
@@ -24,4 +27,9 @@ public class CreateObjectBean { //Bu class olusturdugumuz beanleri toplu bi seki
         return new LessonProgramDto();
     }
 
+    @Bean
+
+    public TeacherRequestDto teacherRequestDto(){
+        return new TeacherRequestDto();
+    }
 }

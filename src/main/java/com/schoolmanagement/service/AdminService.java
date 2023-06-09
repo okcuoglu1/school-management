@@ -7,6 +7,7 @@ import com.schoolmanagement.payload.request.AdminRequest;
 import com.schoolmanagement.payload.response.AdminResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.repository.*;
+import com.schoolmanagement.utils.FieldControl;
 import com.schoolmanagement.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,13 +32,15 @@ public class AdminService {
 
    private final UserRoleService userRoleService;
    private final PasswordEncoder passwordEncoder;
+    private final FieldControl fieldControl;
 
 
     // Not: save() ***********************************
     public ResponseMessage save(AdminRequest request) {
 
         // Girilen username - ssn - phoneNumber unique mi kontrolü-
-        checkDuplicate(request.getUsername(), request.getSsn(), request.getPhoneNumber());
+        fieldControl.checkDuplicate(request.getUsername(), request.getSsn(), request.getPhoneNumber());
+        //checkDuplicate(request.getUsername(), request.getSsn(), request.getPhoneNumber());
         //Admin nesnesini builder ile olusturalım
       Admin admin = createAdminForSave(request);
       admin.setBuilt_in(false);
@@ -60,7 +63,7 @@ public class AdminService {
 
     }
 
-    public void checkDuplicate(String username,String ssn, String phone){
+  /*  public void checkDuplicate(String username,String ssn, String phone){
 
         if(adminRepository.existsByUsername(username) ||
                 deanRepository.existsByUsername(username) ||
@@ -87,6 +90,8 @@ public class AdminService {
 
 
     }
+
+   */
 
 
    // ODEV -- yukardaki duplicate methodunu 4 parametreli hale getirmek istersem ???

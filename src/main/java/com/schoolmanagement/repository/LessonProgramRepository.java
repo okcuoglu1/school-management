@@ -1,6 +1,7 @@
 package com.schoolmanagement.repository;
 
 import com.schoolmanagement.entity.concretes.LessonProgram;
+import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,11 @@ public interface LessonProgramRepository extends JpaRepository<LessonProgram, Lo
 
     @Query("SELECT l FROM LessonProgram l inner join l.teachers teachers where teachers.username = ?1")
     Set<LessonProgram> getLessonProgramByTeacherUsername(String username);
+
+    @Query("SELECT l FROM LessonProgram l inner join l.students students WHERE students.username =?1")
+    Set<LessonProgram> getLessonProgramByStudentUsername(String username);
+
+    //lessonProgramda olan
+    @Query("SELECT l FROM LessonProgram l WHERE l.id IN :lessonIdList" )
+    Set<LessonProgram> getLessonProgramByLessonIdList(Set<Long> lessonIdList);
 }
