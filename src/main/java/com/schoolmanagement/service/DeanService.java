@@ -9,6 +9,7 @@ import com.schoolmanagement.payload.response.DeanResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.repository.DeanRepository;
 import com.schoolmanagement.utils.CheckParameterUpdateMethod;
+import com.schoolmanagement.utils.FieldControl;
 import com.schoolmanagement.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,16 +32,17 @@ import java.util.stream.Collectors;
 public class DeanService {
 
     private final DeanRepository deanRepository;
-    private final AdminService adminService;
+
     private final DeanDto deanDto;
     private final UserRoleService userRoleService;
     private final PasswordEncoder passwordEncoder;
+    private final FieldControl fieldControl;
 
 
     public ResponseMessage<DeanResponse> save(DeanRequest deanRequest) {
 
         //!!! Duplicate kontrolü -> Unique olması gereken datalar var. Müdür'ün ssn num ve built_in olarak adminin ssni ile aynı olabilir bunu engellemek gerek.
-        adminService.checkDuplicate(deanRequest.getUsername(), deanRequest.getSsn(), deanRequest.getPhoneNumber());
+        fieldControl.checkDuplicate(deanRequest.getUsername(), deanRequest.getSsn(), deanRequest.getPhoneNumber());
 
         //!!! DT0- POJO DONUSUMU - Save islemi olacagı icin pojoya ceviriyoruz.
         Dean dean = createDtoForDean(deanRequest);
@@ -99,7 +101,7 @@ public class DeanService {
 
         } else if (!CheckParameterUpdateMethod.checkParameter(dean.get(), newDean)) {
 
-            adminService.checkDuplicate(newDean.getUsername(), newDean.getSsn(), newDean.getPhoneNumber());
+            fieldControl.checkDuplicate(newDean.getUsername(), newDean.getSsn(), newDean.getPhoneNumber());
 
         }
 

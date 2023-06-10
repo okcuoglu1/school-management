@@ -4,7 +4,9 @@ import com.schoolmanagement.entity.concretes.LessonProgram;
 import com.schoolmanagement.entity.concretes.Teacher;
 import com.schoolmanagement.entity.enums.RoleType;
 import com.schoolmanagement.exception.BadRequestException;
+import com.schoolmanagement.exception.ResourceNotFoundException;
 import com.schoolmanagement.payload.dto.TeacherRequestDto;
+import com.schoolmanagement.payload.request.ChooseLessonTeacherRequest;
 import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
@@ -12,11 +14,19 @@ import com.schoolmanagement.repository.TeacherRepository;
 import com.schoolmanagement.utils.FieldControl;
 import com.schoolmanagement.utils.Messages;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +43,10 @@ public class TeacherService {
     // Not: Save() **********************************************************
     public ResponseMessage<TeacherResponse> save(TeacherRequest teacherRequest) {
 
-        Set<LessonProgram> lessons = lessonProgramService.getLessonProgramById(teacherRequest.getLessonIdList());
+        Set<LessonProgram> lessons = lessonProgramService.getLessonProgramById(teacherRequest.getLessonsIdList());
 
-        if(lessons.size()==0){
-            throw  new BadRequestException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE);
+        if (lessons.size() == 0) {
+            throw new BadRequestException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE);
         } else {
 
             // !!! Dublicate kontrolu
@@ -65,11 +75,11 @@ public class TeacherService {
         }
     }
 
-    private Teacher teacherRequestToDto(TeacherRequest teacherRequest){
+    private Teacher teacherRequestToDto(TeacherRequest teacherRequest) {
         return teacherRequestDto.dtoTeacher(teacherRequest);
     }
 
-    private TeacherResponse createTeacherResponse(Teacher teacher){
+    private TeacherResponse createTeacherResponse(Teacher teacher) {
         return TeacherResponse.builder()
                 .userId(teacher.getId())
                 .username(teacher.getUsername())
@@ -82,5 +92,161 @@ public class TeacherService {
                 .gender(teacher.getGender())
                 .email(teacher.getEmail())
                 .build();
+    }
+
+    // Not: getAll() **********************************************************
+    public List<TeacherResponse> getAllTeacher() {
+        return teacherRepository.findAll()
+                .stream()
+                .map(this::createTeacherResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Not: updateTeacherById() ************************************************
+    public ResponseMessage<TeacherResponse> updateTeacher(TeacherRequest newTeacher, Long userId) {
+        //!!! id uzerinden teacher nesnesi getiriliyor
+        Optional<Teacher> teacher = teacherRepository.findById(userId);
+        // DTO uzerinden eklenecek lessonlar getiriliyor
+        Set<LessonProgram> lessons = lessonProgramService.getLessonProgramById(newTeacher.getLessonsIdList());
+
+        if (!teacher.isPresent()) {
+            throw new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE);
+        } else if (lessons.size() == 0) {
+            throw new BadRequestException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE);
+        } else if (!checkParameterForUpdateMethod(teacher.get(), newTeacher)) {
+            fieldControl.checkDuplicate(newTeacher.getUsername(),
+                    newTeacher.getSsn(),
+                    newTeacher.getPhoneNumber(),
+                    newTeacher.getEmail());
+        }
+
+        //gelen dtoyu pojoya ceviriyoruz dbye kayıt icin
+        Teacher updatedTeacher = createUpdatedTeacher(newTeacher, userId);
+        // !!! password encode ediliyor
+        updatedTeacher.setPassword(passwordEncoder.encode(newTeacher.getPassword()));
+        // !!! Lesson program setliyoruz
+        updatedTeacher.setLessonsProgramList(lessons); // TODO buraya bakilacak
+        //kontroller yapıldıktan sonra gelen update olan teacher dbye kaydediliyor
+        Teacher savedTeacher = teacherRepository.save(updatedTeacher);
+        //TODO AdvisorTeacher eklenince yazilacak
+
+        return ResponseMessage.<TeacherResponse>builder()
+                .object(createTeacherResponse(savedTeacher))
+                .message("Teacher updated Successfully")
+                .httpStatus(HttpStatus.OK)
+                .build();
+
+    }
+
+    //checkparameterupdate methodun email li hali
+    private boolean checkParameterForUpdateMethod(Teacher teacher, TeacherRequest newTeacherRequest) {
+        return teacher.getSsn().equalsIgnoreCase(newTeacherRequest.getSsn())
+                || teacher.getUsername().equalsIgnoreCase(newTeacherRequest.getUsername())
+                || teacher.getPhoneNumber().equalsIgnoreCase(newTeacherRequest.getPhoneNumber())
+                || teacher.getEmail().equalsIgnoreCase(newTeacherRequest.getEmail());
+    }
+
+    private Teacher createUpdatedTeacher(TeacherRequest teacher, Long id) {
+        return Teacher.builder()
+                .id(id)
+                .username(teacher.getUsername())
+                .name(teacher.getName())
+                .surname(teacher.getSurname())
+                .ssn(teacher.getSsn())
+                .birthDay(teacher.getBirthDay())
+                .birthPlace(teacher.getBirthPlace())
+                .phoneNumber(teacher.getPhoneNumber())
+                .isAdvisor(teacher.isAdvisorTeacher())
+                .userRole(userRoleService.getUserRole(RoleType.TEACHER))
+                .gender(teacher.getGender())
+                .email(teacher.getEmail())
+                .build();
+    }
+
+    // Not: getTeacherByName() **************************************************
+    public List<TeacherResponse> getTeacherByName(String teacherName) {
+
+        //getTeacherByNameContaining -> Türetilen bir methoddur. Teacher tabloma git parametrede verdiğim isimde bir teacher var mı? eğer varsa onu bana getir
+        return teacherRepository.getTeacherByNameContaining(teacherName).
+                stream().
+                map(this::createTeacherResponse).//parametresiz yazdık bunu sor!!!
+                        collect(Collectors.toList());
+    }
+
+    // Not: deleteTeacher() *****************************************************
+    public ResponseMessage<?> deleteTeacher(Long id) {
+
+         teacherRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+         //todo lessonprogram classından teacher kaldirilacak?
+        teacherRepository.deleteById(id); //delete methoduyla entity vermem gerekir. Ama deleteById ile direk id ile silebiliriz.
+
+
+        return ResponseMessage.builder().
+                message("Teacher is deleted").
+                httpStatus(HttpStatus.OK).
+                build();
+
+
+    }
+
+    // Not: getTeacherById() ****************************************************
+    public ResponseMessage<TeacherResponse> getSavedTeacherById(Long id) {
+
+      Teacher teacher =  teacherRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+
+      return ResponseMessage.<TeacherResponse>builder().object(createTeacherResponse(teacher)).
+              message("Teacher Successfully found").
+              httpStatus(HttpStatus.OK).
+              build();
+
+
+
+    }
+
+    // Not: getAllWithPage() ****************************************************
+    public Page<TeacherResponse> search(int page, int size, String sort, String type) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+
+        if(Objects.equals(type, "desc")){
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        return teacherRepository.findAll(pageable).map(this::createTeacherResponse);
+
+
+    }
+
+    // Not: addLessonProgramToTeachersLessonsProgram() **********************************
+
+    public ResponseMessage<TeacherResponse> chooseLesson(ChooseLessonTeacherRequest chooseLessonRequest) {
+
+        //!!! Ya teacher yoksa?
+     Teacher teacher  =  teacherRepository.findById(chooseLessonRequest.getTeacherId()).orElseThrow(()-> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+     //!!!LessonProgram getiriliyor - ilgili teachera ekliyecğimiz olan lessonprogram
+      Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(chooseLessonRequest.getLessonProgramId());
+      // todo eklenecek olan lessonprogram mevcuttaki LessonProgram var mi kontrolü gerekli mi?
+
+
+      //lesson programın içi boş mu
+        if(lessonPrograms.size()==0){
+
+            throw new ResourceNotFoundException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE);
+        }
+
+        //!!! teacherın mevcut ders programı getiriliyor
+       Set<LessonProgram> existLessonProgram = teacher.getLessonsProgramList();
+        //Todo eklenecek olan LessonProgram mevcuttaki LessonProgramda var mi kontrolü
+        existLessonProgram.addAll(lessonPrograms);
+        teacher.setLessonsProgramList(existLessonProgram);
+
+       Teacher savedTeacher = teacherRepository.save(teacher);
+
+       return ResponseMessage.<TeacherResponse>builder().
+               message("LessonProgram added to Teacher").
+               httpStatus(HttpStatus.CREATED).
+               object(createTeacherResponse(savedTeacher)).
+               build();
+
+
     }
 }

@@ -77,7 +77,7 @@ public class LessonProgramController {
 
     }
 
-    //Not: getLessonProgramStudent() ******************************************************
+    //Not: getLessonProgramByStudent() ******************************************************
     @GetMapping("/getAllLessonProgramByStudent") //http://localhost:8080/lessonPrograms/getAllLessonProgramByStudent
     @PreAuthorize("hasAnyAuthority('TEACHER','ADMIN','MANAGER','ASSISTANTMANAGER')")
     public Set<LessonProgramResponse> getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
