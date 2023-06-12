@@ -96,7 +96,8 @@ public class TeacherController {
     }
 
 
-
+    //Öğretmenin mevcutta bir ders programı olabilir, olmayadabilir. Teacher a yeni bir lesson program eklemek için kullanıyoruz.
+    //Bir öğretmenin birden fazla lesson programı olabilir. Mesela matematik dersinin türevi olan calculus dersinin farklı bir ders programı olucaktır.
     // Not: addLessonProgramToTeachersLessonsProgram() **********************************
     //!!! TEACHER A LESSON PROGRAM EKLİYORUZ.
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER')")

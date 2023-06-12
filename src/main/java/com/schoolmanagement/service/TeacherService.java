@@ -11,6 +11,7 @@ import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
 import com.schoolmanagement.repository.TeacherRepository;
+import com.schoolmanagement.utils.CheckSameLessonProgram;
 import com.schoolmanagement.utils.FieldControl;
 import com.schoolmanagement.utils.Messages;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class TeacherService {
     private final PasswordEncoder passwordEncoder;
     private final TeacherRequestDto teacherRequestDto;
     private final UserRoleService userRoleService;
+    private final AdvisorTeacherService advisorTeacherService;
 
 
     // Not: Save() **********************************************************
@@ -65,7 +67,13 @@ public class TeacherService {
             teacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
             // !!! Db ye kayit islemi
             Teacher savedTeacher = teacherRepository.save(teacher);
-            //TODO AdvisorTeacher yazilinca ekleme yapilacak
+
+            // Eğer advisor teacher ise teacher tablosunda isAdvisor fieldı true ya cekicez. advisor teacher tablosuna da eklememiz gerekiyor.
+            if(teacherRequest.isAdvisorTeacher()){
+
+                advisorTeacherService.saveAdvisorTeacher(savedTeacher);
+
+            }
 
             return ResponseMessage.<TeacherResponse>builder()
                     .message("Teacher saved successfully")
@@ -106,8 +114,9 @@ public class TeacherService {
     public ResponseMessage<TeacherResponse> updateTeacher(TeacherRequest newTeacher, Long userId) {
         //!!! id uzerinden teacher nesnesi getiriliyor
         Optional<Teacher> teacher = teacherRepository.findById(userId);
-        // DTO uzerinden eklenecek lessonlar getiriliyor
+        // DTO uzerinden eklenecek lessonlar getiriliyor - DBden yeni ekleyeceğim lessonprogramları çektik.
         Set<LessonProgram> lessons = lessonProgramService.getLessonProgramById(newTeacher.getLessonsIdList());
+        //!!! SOR ama burda repodan gelmiş?
 
         if (!teacher.isPresent()) {
             throw new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE);
@@ -128,7 +137,11 @@ public class TeacherService {
         updatedTeacher.setLessonsProgramList(lessons); // TODO buraya bakilacak
         //kontroller yapıldıktan sonra gelen update olan teacher dbye kaydediliyor
         Teacher savedTeacher = teacherRepository.save(updatedTeacher);
-        //TODO AdvisorTeacher eklenince yazilacak
+
+        //advisor teacher kısmı update edilmişse diye!
+        advisorTeacherService.updateAdvisorTeacher(newTeacher.isAdvisorTeacher(), savedTeacher);
+
+
 
         return ResponseMessage.<TeacherResponse>builder()
                 .object(createTeacherResponse(savedTeacher))
@@ -148,7 +161,7 @@ public class TeacherService {
 
     private Teacher createUpdatedTeacher(TeacherRequest teacher, Long id) {
         return Teacher.builder()
-                .id(id)
+                .id(id) //id setlemezsek bunu yeni bir kayıt gibi algılar. save methodu hem yeni kayıt yapar hem de eski kayıtı update edebilir. Id'liyse update yapar.
                 .username(teacher.getUsername())
                 .name(teacher.getName())
                 .surname(teacher.getSurname())
@@ -176,8 +189,8 @@ public class TeacherService {
     // Not: deleteTeacher() *****************************************************
     public ResponseMessage<?> deleteTeacher(Long id) {
 
-         teacherRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
-         //todo lessonprogram classından teacher kaldirilacak?
+        teacherRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+        //todo lessonprogram classından teacher kaldirilacak?
         teacherRepository.deleteById(id); //delete methoduyla entity vermem gerekir. Ama deleteById ile direk id ile silebiliriz.
 
 
@@ -192,13 +205,12 @@ public class TeacherService {
     // Not: getTeacherById() ****************************************************
     public ResponseMessage<TeacherResponse> getSavedTeacherById(Long id) {
 
-      Teacher teacher =  teacherRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+        Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
 
-      return ResponseMessage.<TeacherResponse>builder().object(createTeacherResponse(teacher)).
-              message("Teacher Successfully found").
-              httpStatus(HttpStatus.OK).
-              build();
-
+        return ResponseMessage.<TeacherResponse>builder().object(createTeacherResponse(teacher)).
+                message("Teacher Successfully found").
+                httpStatus(HttpStatus.OK).
+                build();
 
 
     }
@@ -208,7 +220,7 @@ public class TeacherService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
 
-        if(Objects.equals(type, "desc")){
+        if (Objects.equals(type, "desc")) {
             pageable = PageRequest.of(page, size, Sort.by(sort).descending());
         }
         return teacherRepository.findAll(pageable).map(this::createTeacherResponse);
@@ -221,31 +233,31 @@ public class TeacherService {
     public ResponseMessage<TeacherResponse> chooseLesson(ChooseLessonTeacherRequest chooseLessonRequest) {
 
         //!!! Ya teacher yoksa?
-     Teacher teacher  =  teacherRepository.findById(chooseLessonRequest.getTeacherId()).orElseThrow(()-> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
-     //!!!LessonProgram getiriliyor - ilgili teachera ekliyecğimiz olan lessonprogram
-      Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(chooseLessonRequest.getLessonProgramId());
-      // todo eklenecek olan lessonprogram mevcuttaki LessonProgram var mi kontrolü gerekli mi?
+        Teacher teacher = teacherRepository.findById(chooseLessonRequest.getTeacherId()).orElseThrow(() -> new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE));
+        //!!!LessonProgram getiriliyor - ilgili teachera ekliyecğimiz olan lessonprogramlar
+        Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(chooseLessonRequest.getLessonProgramId());
 
-
-      //lesson programın içi boş mu
-        if(lessonPrograms.size()==0){
+        //lesson programın içi boş mu
+        if (lessonPrograms.size() == 0) {
 
             throw new ResourceNotFoundException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE);
         }
 
         //!!! teacherın mevcut ders programı getiriliyor
-       Set<LessonProgram> existLessonProgram = teacher.getLessonsProgramList();
-        //Todo eklenecek olan LessonProgram mevcuttaki LessonProgramda var mi kontrolü
+        Set<LessonProgram> existLessonProgram = teacher.getLessonsProgramList();
+
+        CheckSameLessonProgram.checkLessonPrograms(existLessonProgram, lessonPrograms);
+
         existLessonProgram.addAll(lessonPrograms);
         teacher.setLessonsProgramList(existLessonProgram);
 
-       Teacher savedTeacher = teacherRepository.save(teacher);
+        Teacher savedTeacher = teacherRepository.save(teacher);
 
-       return ResponseMessage.<TeacherResponse>builder().
-               message("LessonProgram added to Teacher").
-               httpStatus(HttpStatus.CREATED).
-               object(createTeacherResponse(savedTeacher)).
-               build();
+        return ResponseMessage.<TeacherResponse>builder().
+                message("LessonProgram added to Teacher").
+                httpStatus(HttpStatus.CREATED).
+                object(createTeacherResponse(savedTeacher)).
+                build();
 
 
     }

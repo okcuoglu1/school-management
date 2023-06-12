@@ -42,7 +42,8 @@ public class DeanService {
     public ResponseMessage<DeanResponse> save(DeanRequest deanRequest) {
 
         //!!! Duplicate kontrolü -> Unique olması gereken datalar var. Müdür'ün ssn num ve built_in olarak adminin ssni ile aynı olabilir bunu engellemek gerek.
-        fieldControl.checkDuplicate(deanRequest.getUsername(), deanRequest.getSsn(), deanRequest.getPhoneNumber());
+        fieldControl.
+                checkDuplicate(deanRequest.getUsername(), deanRequest.getSsn(), deanRequest.getPhoneNumber());
 
         //!!! DT0- POJO DONUSUMU - Save islemi olacagı icin pojoya ceviriyoruz.
         Dean dean = createDtoForDean(deanRequest);

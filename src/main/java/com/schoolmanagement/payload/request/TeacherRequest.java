@@ -18,7 +18,7 @@ import java.util.Set;
 public class TeacherRequest extends BaseUserRequest {
 
     @NotNull(message = "Please select Lesson")
-    private Set<Long> lessonsIdList;
+    private Set<Long> lessonsIdList; //lesson prgram idleri bunlar
 
     @NotNull(message = "Please select isAdvisor Teacher")
     private boolean isAdvisorTeacher; //Non-primitive boolean is ile baslayan lombotan kaynaklı getter setterlar düzgün calısmıyor
