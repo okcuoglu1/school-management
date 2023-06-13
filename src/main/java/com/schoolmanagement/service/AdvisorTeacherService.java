@@ -34,6 +34,7 @@ public class AdvisorTeacherService {
       AdvisorTeacher advisorTeacher =  advisorTeacherRepository.findById(id).orElseThrow(()->
               new ResourceNotFoundException(Messages.LESSON_PROGRAM_NOT_FOUND_MESSAGE));
 
+
       advisorTeacherRepository.deleteById(advisorTeacher.getId());
 
       return ResponseMessage.<AdvisorTeacher>builder().
@@ -111,6 +112,15 @@ public class AdvisorTeacherService {
             //Sor?????
             advisorTeacherRepository.save(advisorTeacherBuilder.build());
         }
+
+    }
+
+    //Not: StudentService tarafında gerekli method
+    public Optional<AdvisorTeacher> getAdvisorTeacherById(Long advisorTeacherId) {
+
+        return advisorTeacherRepository.findById(advisorTeacherId);
+
+
 
     }
 }
