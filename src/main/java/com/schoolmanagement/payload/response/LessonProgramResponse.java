@@ -27,5 +27,5 @@ public class LessonProgramResponse {
     private Set<Lesson> lessonName;
     private EducationTerm educationTerm;
     private Set<TeacherResponse> teachers;
-    // TODO student  yazilinca eklemeler yapilacak
+    private Set<StudentResponse> students;
 }
