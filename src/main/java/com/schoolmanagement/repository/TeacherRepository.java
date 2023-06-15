@@ -19,4 +19,6 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
     //@Query("select t from Teacher t where t.name like concat('%', ?1, '%')")
     List<Teacher> getTeacherByNameContaining(String teacherName);
+
+    Teacher getTeacherByUsername(String username);
 }

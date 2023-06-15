@@ -8,11 +8,11 @@ import com.schoolmanagement.exception.BadRequestException;
 import com.schoolmanagement.exception.ResourceNotFoundException;
 import com.schoolmanagement.payload.dto.LessonProgramDto;
 import com.schoolmanagement.payload.request.LessonProgramRequest;
-import com.schoolmanagement.payload.request.TeacherRequest;
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
 import com.schoolmanagement.repository.LessonProgramRepository;
+import com.schoolmanagement.utils.CreateResponseObjectForService;
 import com.schoolmanagement.utils.Messages;
 import com.schoolmanagement.utils.TimeControl;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,7 @@ public class LessonProgramService {
     private final LessonService lessonService;
     private final LessonProgramDto lessonProgramDto;
     private final EducationTermService educationTermService;
+    private final CreateResponseObjectForService createResponseObjectForService;
 
 
     // Not :  Save() *************************************************************************
@@ -99,8 +100,10 @@ public class LessonProgramService {
                         .stream()
                         .map(this::createTeacherResponse)
                         .collect(Collectors.toSet()))
-
-        //TODO Student yazilinca buraya ekleme yapilacak
+                .students(lessonProgram.getStudents()
+                        .stream()
+                        .map(createResponseObjectForService::createStudentResponse)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -180,7 +183,10 @@ public class LessonProgramService {
                 .stopTime(lessonProgram.getStopTime())
                 .lessonProgramId(lessonProgram.getId())
                 .lessonName(lessonProgram.getLesson())
-                //TODO Student yazilinca buraya ekleme yapilacak
+                .students(lessonProgram.getStudents()
+                        .stream()
+                        .map(createResponseObjectForService::createStudentResponse)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -209,7 +215,6 @@ public class LessonProgramService {
 
     }
 
-
     // Not :  getAllWithPage() ******************************************************************
     public Page<LessonProgramResponse> search(int page, int size, String sort, String type) {
 
@@ -221,10 +226,9 @@ public class LessonProgramService {
         return lessonProgramRepository.findAll(pageable).map(this::createLessonProgramResponse);
     }
 
-    //Not: getLessonProgramById() ************************************************
+    // Not: getLessonProgramById() ***************************************************************
     public Set<LessonProgram> getLessonProgramById(Set<Long> lessonIdList) {
 
-        return lessonProgramRepository.getLessonProgramByLessonIdList(lessonIdList);
-
+        return lessonProgramRepository.getLessonProgramByLessonProgramIdList(lessonIdList);
     }
 }

@@ -93,7 +93,7 @@ public class StudentService {
         return studentRepository.getMaxStudentNumber() +1;
     }
 
-    private StudentResponse createStudentResponse(Student student) {
+   public StudentResponse createStudentResponse(Student student) {
         return StudentResponse.builder()
                 .userId(student.getId())
                 .username(student.getUsername())

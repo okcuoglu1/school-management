@@ -261,4 +261,18 @@ public class TeacherService {
 
 
     }
+
+
+    //Not StudentInfoService icin eklendi
+    public Teacher getTeacherByUsername(String username) {
+
+        //findByUsername(username).orElseThrow ile de yazılabilirdi.
+
+    if(!teacherRepository.existsByUsername(username)){
+        throw new ResourceNotFoundException(Messages.NOT_FOUND_USER_MESSAGE);
+    }
+
+    return  teacherRepository.getTeacherByUsername(username);
+
+    }
 }
