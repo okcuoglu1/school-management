@@ -275,4 +275,11 @@ public class TeacherService {
     return  teacherRepository.getTeacherByUsername(username);
 
     }
+
+
+    public boolean existByUsername(String username) {
+
+        return teacherRepository.existsByUsername(username);
+
+    }
 }
