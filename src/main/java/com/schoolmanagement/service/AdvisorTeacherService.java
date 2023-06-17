@@ -123,5 +123,13 @@ public class AdvisorTeacherService {
 
 
     }
+
+    //not MeerService de kullanılan method.***
+    // Eğer service classında bir method pojo döndürüyorsa bu method baska bir servicede kullanılmak içindir.
+    public Optional<AdvisorTeacher> getAdvisorTeacherByUsername(String username) {
+
+        return advisorTeacherRepository.findByTeacher_UsernameEquals(username);
+
+    }
 }
 

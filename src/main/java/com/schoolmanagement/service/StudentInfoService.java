@@ -18,9 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -270,16 +274,18 @@ public class StudentInfoService {
 
     }
 
-    public Page<StudentInfoResponse> getAllWithPage(int page, int size) {
-
-        Pageable pageable = PageRequest.of(page,size, Sort.by("id").descending());
-
-        return studentInfoRepository.findAll(pageable).map(this::createResponse);
-
-
-    }
 
     // Not: getAllWithPage()******************************************************
+
+    public Page<StudentInfoResponse> search(int page, int size, String sort, String type) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        if (Objects.equals(type, "desc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+
+        return studentInfoRepository.findAll(pageable).map(this::createResponse);
+    }
 
 
 }

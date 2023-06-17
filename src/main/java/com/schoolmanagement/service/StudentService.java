@@ -275,4 +275,11 @@ public class StudentService {
         return studentRepository.existsById(studentId);
     }
 
+
+    //not MeetService icin yazıldı
+    public List<Student> getStudentByIds(Long[] studentIds) {
+
+        return studentRepository.findByIdsEquals(studentIds);
+
+    }
 }
