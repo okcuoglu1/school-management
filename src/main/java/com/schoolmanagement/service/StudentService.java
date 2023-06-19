@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -281,5 +282,11 @@ public class StudentService {
 
         return studentRepository.findByIdsEquals(studentIds);
 
+    }
+
+    //not MeetService icin yazıldı
+    public Optional<Student> getStudentByUsernameForOptional(String username) {
+
+        return studentRepository.findByUsernameEqualsForOptional(username);
     }
 }

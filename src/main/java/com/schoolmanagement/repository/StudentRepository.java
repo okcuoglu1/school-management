@@ -37,4 +37,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     //meetservice icin yazılan query
     @Query("SELECT S FROM Student s WHERE s.id IN : id")
     List<Student> findByIdsEquals(Long[] id);
+
+    @Query("SELECT s FROM Student s WHERE s.username=:username")
+    Optional<Student> findByUsernameEqualsForOptional(String username);
 }

@@ -20,7 +20,7 @@ public class AdvisorTeacherController {
     //Not save() methodu olmayacak çünkü save kısmını teacher da yapıyoruz. AdvisorTeacher zaten bir teacher!.
 
     // Not: deleteAdvisorTeacher() ******************************************************
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     @DeleteMapping("/delete/{id}")
     public ResponseMessage<?> deleteAdvisorTeacher(@PathVariable Long id){
 
@@ -29,7 +29,7 @@ public class AdvisorTeacherController {
     }
 
     // Not: getAllAdvisorTeacher() ******************************************************
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     @GetMapping("/getAll")
     public List<AdvisorTeacherResponse> getAllAdvisorTeacher(){
 
@@ -38,7 +38,7 @@ public class AdvisorTeacherController {
     }
 
     // Not: getAllAdvisorTeacherWithPage() **********************************************
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANTMANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     @GetMapping("/search")
     public Page<AdvisorTeacherResponse> search( @RequestParam(value = "page") int page,
                                                 @RequestParam(value = "size") int size,
