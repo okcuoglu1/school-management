@@ -13,19 +13,16 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-
-
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${backendapi.app.jwtSecret}") //App propertiesdeki değeri alıyoruz.
+    @Value("${backendapi.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${backendapi.app.jwtExpressionMS}") //App propertiesdeki değeri alıyoruz.
+    @Value("${backendapi.app.jwtExpressionMS}")
     private long jwtExpirationMs;
 
 
     // Not: Generate JWT *************************************************
-    //Login olan kullanıcıya Authentication classı ile ulaşıyoruz.
     public String generateJwtToken(Authentication authentication) {
 
         //anlik olarak login islemi yapan kullanici bilgisi :

@@ -59,8 +59,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable() //cors -> Farklı serverlardan gelen istekleri tarayıcı uymadığı icin red ediyor. Hata almamak icin disable ettik.
-                //csrf -> update methodları düzgün calısmıyor o yüzden disable.
+        http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll()
@@ -80,9 +79,12 @@ public class WebSecurityConfig {
             "/*.js",
             "/*.json",
             "/contactMessages/save",
-            "/auth/login"
+            "/auth/login",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger*/**"
 
-    };
+};
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {

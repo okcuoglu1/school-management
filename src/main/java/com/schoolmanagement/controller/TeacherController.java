@@ -72,7 +72,7 @@ public class TeacherController {
 
     // Not: getTeacherById() ****************************************************
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/getTeacher/{id}")
+    @GetMapping("/getSavedTeacherById/{id}")
     public ResponseMessage<TeacherResponse> getSavedTeacherById(@PathVariable Long id){
 
         return teacherService.getSavedTeacherById(id);

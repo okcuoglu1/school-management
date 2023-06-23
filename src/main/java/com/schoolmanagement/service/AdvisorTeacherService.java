@@ -64,7 +64,7 @@ public class AdvisorTeacherService {
     }
 
     // Not: getAllAdvisorTeacherWithPage() **********************************************
-    public Page<AdvisorTeacherResponse> search(int page, int size, String sort, int type) {
+    public Page<AdvisorTeacherResponse> search(int page, int size, String sort, String type) {
 
         Pageable pageable = PageRequest.of(page,size, Sort.by(sort).ascending());
 

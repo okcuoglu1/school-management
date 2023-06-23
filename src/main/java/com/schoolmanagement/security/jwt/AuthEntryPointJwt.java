@@ -25,12 +25,11 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
-
         // logger kullanilarak yetkilendirme hatasi kaydediliyor
         logger.error("Unauthorized error : {}", authException.getMessage());
 
         // response icerigi JSON olacak ve HTTP Status Cod da 401, UnAuthorized olacagini setliyorum
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE); //göndereceğimiz response da json dosya olucagını söyledik.
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         final Map<String, Object> body = new HashMap<>();

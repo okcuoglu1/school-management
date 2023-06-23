@@ -1,7 +1,5 @@
 package com.schoolmanagement.security.service;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +29,7 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
-    private Collection<? extends GrantedAuthority> authorities; //? extends GrantedAuthority bu classdan türeyen classlar girebilir.
+    private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String username, String name, Boolean isAdvisor, String password, String role) {
         this.id = id;
@@ -80,14 +78,12 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public boolean equals(Object o) {
-
-        if(this == o) //kendisiyle karsılastırılıyor.
-         return true;
-
-        if(o == null || getClass() != o.getClass()) //getClass objenin fieldlarını döndürüyor.
+        if(this == o) // kensisi ile karsilastiriliyor
+            return true ;
+        if( o== null || getClass() != o.getClass())
             return false;
-
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id); // id ile kiyaslama
     }
+
 }

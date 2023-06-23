@@ -43,7 +43,7 @@ public class AdvisorTeacherController {
     public Page<AdvisorTeacherResponse> search( @RequestParam(value = "page") int page,
                                                 @RequestParam(value = "size") int size,
                                                 @RequestParam(value = "sort") String sort,
-                                                @RequestParam(value = "type") int type){
+                                                @RequestParam(value = "type") String type){
 
         return advisorTeacherService.search(page, size, sort, type);
 

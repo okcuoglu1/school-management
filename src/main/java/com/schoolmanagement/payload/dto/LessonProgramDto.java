@@ -6,6 +6,7 @@ import com.schoolmanagement.payload.request.LessonProgramRequest;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
 
 @Data

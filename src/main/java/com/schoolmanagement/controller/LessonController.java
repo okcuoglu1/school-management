@@ -51,7 +51,7 @@ public class LessonController {
     }
 
     // Not :  getAllLesson() **********************************************************************
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')") // TODO student veya teacher kelenebilir mi ??
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     @GetMapping("/getAll")  // http://localhost:8080/lessons/getAll
     public List<LessonResponse> getAllLesson() {
         return lessonService.getAllLesson();
@@ -76,7 +76,7 @@ public class LessonController {
         return lessonService.getLessonByLessonIdList(idList);
     }
 
-    // TODO : Update methodu yazilacak
+
 
 
 

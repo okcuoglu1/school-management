@@ -1,13 +1,11 @@
 package com.schoolmanagement.service;
 
-import com.schoolmanagement.entity.concretes.EducationTerm;
-import com.schoolmanagement.entity.concretes.Lesson;
-import com.schoolmanagement.entity.concretes.LessonProgram;
-import com.schoolmanagement.entity.concretes.Teacher;
+import com.schoolmanagement.entity.concretes.*;
 import com.schoolmanagement.exception.BadRequestException;
 import com.schoolmanagement.exception.ResourceNotFoundException;
 import com.schoolmanagement.payload.dto.LessonProgramDto;
 import com.schoolmanagement.payload.request.LessonProgramRequest;
+
 import com.schoolmanagement.payload.response.LessonProgramResponse;
 import com.schoolmanagement.payload.response.ResponseMessage;
 import com.schoolmanagement.payload.response.TeacherResponse;
@@ -231,4 +229,6 @@ public class LessonProgramService {
 
         return lessonProgramRepository.getLessonProgramByLessonProgramIdList(lessonIdList);
     }
+
+
 }

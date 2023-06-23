@@ -44,13 +44,15 @@ public class EmailService {
 
     private static Message prepareMessage(Session session, String from, String recipient,
                                           String mailMessage, String subject) throws MessagingException {
-        Message message = new MimeMessage(session); //session nesnesi ile bu classı olustur.
-        message.setFrom(new InternetAddress(from)); //Kimden göndericeğimiz
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
         message.setText(mailMessage);
+        message.setSubject(subject);
         return message;
-
     }
+
+
 
     @Value("${email.address}") //parametreye gelicek olan email
     public void setEmail(String email){

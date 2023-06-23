@@ -37,7 +37,8 @@ public class StudentInfoController {
     public ResponseMessage<StudentInfoResponse> save(HttpServletRequest httpServletRequest,
                                                      @RequestBody @Valid StudentInfoRequestWithoutTeacherId studentInfoRequestWithoutTeacherId) {
 
-        String username = (String) httpServletRequest.getAttribute("username");
+        //String username = (String) httpServletRequest.getAttribute("username");
+        String username = httpServletRequest.getHeader("username");
         return studentInfoService.save(username, studentInfoRequestWithoutTeacherId);
 
     }
