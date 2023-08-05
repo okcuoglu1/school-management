@@ -21,7 +21,7 @@ public class TeacherRequest extends BaseUserRequest {
     private Set<Long> lessonsIdList; //lesson prgram idleri bunlar
 
     @NotNull(message = "Please select isAdvisor Teacher")
-    private boolean isAdvisorTeacher = true; //Non-primitive boolean is ile baslayan lombotan kaynaklı getter setterlar düzgün calısmıyor
+    private boolean isAdvisorTeacher = true; //Non-primitive boolean is ile baslayan lomboktan kaynaklı getter setterlar düzgün calısmıyor
 
 
     @NotNull(message = "Please enter your email")

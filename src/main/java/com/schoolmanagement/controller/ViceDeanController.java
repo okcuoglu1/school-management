@@ -61,6 +61,8 @@ public class ViceDeanController {
         return viceDeanService.getAllViceDean();
     }
 
+
+
     // Not :  getAllWithPage() ********************************************************************
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     @GetMapping("/search")  // http://localhost:8080/vicedean/search?page=0&size=3&sort=ssn&type=desc
